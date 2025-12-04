@@ -6,6 +6,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 public class ProductoService {
@@ -20,6 +21,13 @@ public class ProductoService {
         return productoRepository.findAll();
     }
 
+    public List<Producto> obtenerConStock() {
+        return productoRepository.findAll()
+                .stream()
+                .filter(prod -> prod.getStock() > 0)
+                .collect(Collectors.toList());
+    }
+
     public Optional<Producto> obtenerPorId(Long id) {
         return productoRepository.findById(id);
     }
@@ -28,6 +36,9 @@ public class ProductoService {
         try {
             if(productoRepository.existsByNombre(producto.getNombre())){
                 throw new Exception("El producto con nombre " + producto.getNombre() + " ya existe");
+            }
+            if (validarProducto(producto)) {
+                throw new IllegalArgumentException("El producto no puede tener precio o stock negativo");
             }
             if (producto.getEstado() == null) {
                 producto.setEstado(true);
@@ -46,6 +57,9 @@ public class ProductoService {
                 productoRepository.existsByNombre(productoActualizado.getNombre())) {
             throw new IllegalArgumentException("El producto con nombre " + productoActualizado.getNombre() + " ya existe");
         }
+        if (validarProducto(productoActualizado)) {
+            throw new IllegalArgumentException("El producto no puede tener precio o stock negativo");
+        }
 
         producto.setNombre(productoActualizado.getNombre());
         producto.setPrecio(productoActualizado.getPrecio());
@@ -57,5 +71,9 @@ public class ProductoService {
 
     public void eliminar(Long id) {
         productoRepository.deleteById(id);
+    }
+
+    private boolean validarProducto(Producto producto) {
+        return producto.getPrecio() >= 0 && producto.getStock() >= 0;
     }
 }

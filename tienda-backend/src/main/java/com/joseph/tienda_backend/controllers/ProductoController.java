@@ -8,14 +8,23 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
+@RestController
+@RequestMapping("/api/productos")
 public class ProductoController {
+
     @Autowired
     private ProductoService productoService;
 
     @GetMapping
     public List<Producto> obtenerTodos() {
         return productoService.obtenerTodos();
+    }
+
+    @GetMapping("/con-stock")
+    public List<Producto> obtenerConStock() {
+        return productoService.obtenerConStock();
     }
 
     @GetMapping("/{id}")
