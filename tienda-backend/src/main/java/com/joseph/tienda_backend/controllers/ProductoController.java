@@ -8,7 +8,6 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/productos")
@@ -29,22 +28,22 @@ public class ProductoController {
 
     @GetMapping("/{id}")
     public ResponseEntity<Producto> obtenerPorId(@PathVariable Long id) {
-        Optional<Producto> estudiante =
+        Optional<Producto> producto =
                 productoService.obtenerPorId(id);
-        return estudiante.map(ResponseEntity::ok)
+        return producto.map(ResponseEntity::ok)
                 .orElse(ResponseEntity.notFound().build());
     }
 
     @PostMapping
-    public Producto crear(@RequestBody Producto estudiante) throws Exception {
-        return productoService.crear(estudiante);
+    public Producto crear(@RequestBody Producto producto) throws Exception {
+        return productoService.crear(producto);
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<Producto> actualizar(@PathVariable Long id, @RequestBody Producto estudiante) {
+    public ResponseEntity<Producto> actualizar(@PathVariable Long id, @RequestBody Producto producto) {
         try {
-            Producto estudianteActualizado = productoService.actualizar(id, estudiante);
-            return ResponseEntity.ok(estudianteActualizado);
+            Producto productoActualizado = productoService.actualizar(id, producto);
+            return ResponseEntity.ok(productoActualizado);
         } catch (Exception e) {
             return ResponseEntity.notFound().build();
         }
