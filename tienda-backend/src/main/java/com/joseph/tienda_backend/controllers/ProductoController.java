@@ -22,9 +22,9 @@ public class ProductoController {
         return productoService.obtenerTodos();
     }
 
-    @GetMapping("/con-stock")
-    public List<Producto> obtenerConStock() {
-        return productoService.obtenerConStock();
+    @GetMapping("/activos")
+    public List<Producto> obtenerActivos() {
+        return productoService.obtenerActivos();
     }
 
     @GetMapping("/{id}")

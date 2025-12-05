@@ -1,6 +1,9 @@
 <div class="lista-container">
   <h1>Lista de Productos</h1>
   <button class="btn-new" (click)="abrirFormulario()">Nuevo Producto</button>
+  <button class="btn-filter" (click)="filtrarPorStock()">
+    {{ filtrarActivos ? 'Ver Todos' : 'Ver Activos' }}
+  </button>
 
   <p *ngIf="loading">Cargando productos...</p>
   <p *ngIf="error" class="error">{{ error }}</p>
@@ -22,7 +25,14 @@
         <td>{{ e.nombre }}</td>
         <td>{{ e.precio }}</td>
         <td>{{ e.stock }}</td>
-        <td>{{ e.estado }}</td>
+        <td>
+          <span 
+            class="badge" 
+            [class.activo]="e.estado" 
+            [class.inactivo]="!e.estado">
+            {{ e.estado ? 'Activo' : 'Inactivo' }}
+          </span>
+        </td>
         <td>
           <button class="btn-edit" (click)="abrirFormulario(e)">Editar</button>
           <button class="btn-delete" (click)="eliminar(e.id)">Eliminar</button>
@@ -54,6 +64,9 @@
           <span *ngIf="nombre.errors?.['minlength']">El nombre es muy corto.</span>
           <span *ngIf="nombre.errors?.['pattern']">Solo se permiten letras.</span>
         </div>
+        <div class="error-msg" *ngIf="nombreDuplicado">
+          Este nombre ya está registrado.
+        </div>
 
         <label>Precio</label>
         <input 
@@ -66,10 +79,9 @@
         />
         <div class="error-msg"
             *ngIf="precio.invalid && (precio.touched || precio.dirty)">
-          Ingresa un precio valido
-        </div>
-        <div class="error-msg" *ngIf="correoDuplicado">
-          Este correo ya está registrado.
+
+          <span *ngIf="precio.errors?.['required']">El precio es obligatorio.</span>
+          <span *ngIf="precio.errors?.['min']">Debe ser mayor o igual a 0.</span>
         </div>
 
         <label>Stock</label>
@@ -78,33 +90,26 @@
           type="number" 
           name="stock" 
           required
-          minlength="3" 
+          min="0" 
           #stock="ngModel"
         />
         <div class="error-msg"
             *ngIf="stock.invalid && (stock.touched || stock.dirty)">
           
-          <span *ngIf="stock.errors?.['required']">La carrera es obligatoria.</span>
-          <span *ngIf="stock.errors?.['minlength']">Debe tener al menos 3 caracteres.</span>
+          <span *ngIf="stock.errors?.['required']">El stock es obligatorio.</span>
+          <span *ngIf="stock.errors?.['min']">Debe ser mayor o igual a 0.</span>
         </div>
 
         <label>Estado</label>
-        <input 
-          [(ngModel)]="selected.estado" 
-          name="estado" 
-          type="text" 
-          required
-          min="1" 
-          max="14"
-          #estado="ngModel"
-        />
-        <div class="error-msg"
-            *ngIf="estado.invalid && (estado.touched || estado.dirty)">
-          
-          <span *ngIf="estado.errors?.['required']">El semestre es obligatorio.</span>
-          <span *ngIf="estado.errors?.['min']">Debe ser mínimo 1.</span>
-          <span *ngIf="estado.errors?.['max']">No puede ser mayor a 12.</span>
-        </div>
+          <div class="switch">
+            <input 
+              type="checkbox" 
+              id="estadoToggle"
+              [(ngModel)]="selected.estado"
+              name="estado"
+            />
+            <label for="estadoToggle">{{ selected.estado ? 'Activo' : 'Inactivo' }}</label>
+          </div>
 
         <div class="modal-buttons">
           <button 

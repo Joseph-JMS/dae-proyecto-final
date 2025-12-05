@@ -16,11 +16,28 @@ export class Inventario {
   showForm = false;
   editMode = false;
   selected: Producto = { id: 0, nombre: '', precio: 0, stock: 0, estado: true };
-  correoDuplicado: boolean = false;
+  nombreDuplicado: boolean = false;
+  filtrarActivos = false;
 
   constructor(private productoService: ProductoService) {
     this.cargarProductos();
   }
+
+  filtrarPorStock() {
+  this.filtrarActivos = !this.filtrarActivos;
+
+  if (this.filtrarActivos) {
+    this.loading = true;
+    this.productoService.getProductosActivos().subscribe({
+      next: (data) => {
+        this.productos = data;
+        this.loading = false;
+      }
+    });
+  } else {
+    this.cargarProductos();
+  }
+}
 
   cargarProductos() {
     this.loading = true;
@@ -30,7 +47,7 @@ export class Inventario {
         this.loading = false;
       },
       error: (err) => {
-        this.error = 'No se pudieron cargar los estudiantes';
+        this.error = 'No se pudieron cargar los productos';
         console.error(err);
         this.loading = false;
       }
@@ -55,15 +72,15 @@ export class Inventario {
   guardar(form: any) {
     if (form.invalid) return;
 
-    this.correoDuplicado = false;
-    const existeCorreo = this.productos.some(
+    this.nombreDuplicado = false;
+    const existeNombre = this.productos.some(
       e =>
         e.nombre.toLowerCase() === this.selected.nombre.toLowerCase() &&
         e.id !== this.selected.id
     );
 
-    if (existeCorreo) {
-      this.correoDuplicado = true;    // <-- activar mensaje
+    if (existeNombre) {
+      this.nombreDuplicado = true;    // <-- activar mensaje
       return;                         // no enviar al backend
     }
 
@@ -86,7 +103,7 @@ export class Inventario {
   }
 
   eliminar(id: number) {
-    if (confirm('¿Deseas eliminar este estudiante?')) {
+    if (confirm('¿Deseas eliminar este producto?')) {
       this.productoService.eliminarProducto(id).subscribe({
         next: () => this.cargarProductos()
       });

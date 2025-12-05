@@ -1,1 +1,115 @@
-<p>proveedores works!</p>
+<div class="lista-container">
+  <h1>Lista de Proveedores</h1>
+
+  <button class="btn-new" (click)="abrirFormulario()">Nuevo Proveedor</button>
+
+  <p *ngIf="loading">Cargando proveedores...</p>
+  <p *ngIf="error" class="error">{{ error }}</p>
+
+  <table *ngIf="!loading && proveedores.length > 0">
+    <thead>
+      <tr>
+        <th>ID</th>
+        <th>Empresa</th>
+        <th>Contacto</th>
+        <th>Teléfono</th>
+        <th>Email</th>
+        <th>Acciones</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let p of proveedores">
+        <td>{{ p.id }}</td>
+        <td>{{ p.empresa }}</td>
+        <td>{{ p.contacto }}</td>
+        <td>{{ p.telefono }}</td>
+        <td>{{ p.email }}</td>
+        <td>
+          <button class="btn-edit" (click)="abrirFormulario(p)">Editar</button>
+          <button class="btn-delete" (click)="eliminar(p.id)">Eliminar</button>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+
+  <p *ngIf="!loading && proveedores.length === 0">No hay proveedores registrados.</p>
+
+  <!-- FORMULARIO -->
+  <div class="modal" *ngIf="showForm">
+    <div class="modal-content">
+      <h2>{{ editMode ? 'Editar Proveedor' : 'Nuevo Proveedor' }}</h2>
+
+      <form #f="ngForm" (ngSubmit)="guardar(f)">
+
+        <!-- Empresa -->
+        <label>Empresa</label>
+        <input 
+          [(ngModel)]="selected.empresa" 
+          name="empresa" 
+          required minlength="3"
+          #empresa="ngModel"
+        />
+        <div class="error-msg" *ngIf="empresa.invalid && (empresa.touched || empresa.dirty)">
+          <span *ngIf="empresa.errors?.['required']">Este campo es obligatorio.</span>
+          <span *ngIf="empresa.errors?.['minlength']">Debe tener al menos 3 caracteres.</span>
+        </div>
+        <div class="error-msg" *ngIf="duplicadoEmpresa">
+          Ya existe un proveedor con este nombre de empresa.
+        </div>
+
+        <!-- Contacto -->
+        <label>Contacto</label>
+        <input 
+          [(ngModel)]="selected.contacto" 
+          name="contacto" 
+          required minlength="3"
+          #contacto="ngModel"
+        />
+        <div class="error-msg" *ngIf="contacto.invalid && (contacto.touched || contacto.dirty)">
+          <span *ngIf="contacto.errors?.['required']">Obligatorio.</span>
+          <span *ngIf="contacto.errors?.['minlength']">Debe tener al menos 3 letras.</span>
+        </div>
+
+        <!-- Telefono -->
+        <label>Teléfono</label>
+        <input 
+          [(ngModel)]="selected.telefono" 
+          name="telefono" 
+          required minlength="6"
+          pattern="^[0-9]+$"
+          #telefono="ngModel"
+        />
+        <div class="error-msg" *ngIf="telefono.invalid && (telefono.touched || telefono.dirty)">
+          <span *ngIf="telefono.errors?.['required']">Obligatorio.</span>
+          <span *ngIf="telefono.errors?.['pattern']">Solo números.</span>
+        </div>
+        <div class="error-msg" *ngIf="duplicadoTelefono">
+          Ya existe un proveedor con este teléfono.
+        </div>
+
+        <!-- Email -->
+        <label>Email</label>
+        <input 
+          [(ngModel)]="selected.email" 
+          name="email" 
+          required type="email"
+          #email="ngModel"
+        />
+        <div class="error-msg" *ngIf="email.invalid && (email.touched || email.dirty)">
+          Ingresa un email válido.
+        </div>
+        <div class="error-msg" *ngIf="duplicadoEmail">
+          Este correo ya está registrado.
+        </div>
+
+        <div class="modal-buttons">
+          <button type="submit" class="btn-save" [disabled]="f.invalid">
+            {{ editMode ? 'Actualizar' : 'Crear' }}
+          </button>
+          <button type="button" class="btn-cancel" (click)="cerrarFormulario()">Cancelar</button>
+        </div>
+
+      </form>
+    </div>
+  </div>
+</div>

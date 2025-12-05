@@ -6,7 +6,6 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 @Service
 public class ProductoService {
@@ -21,11 +20,8 @@ public class ProductoService {
         return productoRepository.findAll();
     }
 
-    public List<Producto> obtenerConStock() {
-        return productoRepository.findAll()
-                .stream()
-                .filter(prod -> prod.getStock() > 0)
-                .collect(Collectors.toList());
+    public List<Producto> obtenerActivos() {
+        return productoRepository.findByEstadoTrue();
     }
 
     public Optional<Producto> obtenerPorId(Long id) {
@@ -74,6 +70,6 @@ public class ProductoService {
     }
 
     private boolean validarProducto(Producto producto) {
-        return producto.getPrecio() >= 0 && producto.getStock() >= 0;
+        return producto.getPrecio() < 0 || producto.getStock() < 0;
     }
 }

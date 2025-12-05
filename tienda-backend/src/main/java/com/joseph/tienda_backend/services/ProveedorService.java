@@ -36,16 +36,18 @@ public class ProveedorService {
     }
 
     public Proveedor actualizar(Long id, Proveedor proveedorActualizado) {
+
         Proveedor proveedor = proveedorRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Proveedor no encontrado con id " + id));
+                .orElseThrow(() -> new RuntimeException("Proveedor no encontrado"));
 
-        boolean existeDuplicado = proveedorRepository.existsByEmpresaOrTelefonoOrEmail(
-                proveedorActualizado.getEmpresa(), proveedorActualizado.getTelefono(), proveedorActualizado.getEmail());
+        Optional<Proveedor> duplicado =
+                proveedorRepository.findByEmpresaOrTelefonoOrEmail(
+                        proveedorActualizado.getEmpresa(),
+                        proveedorActualizado.getTelefono(),
+                        proveedorActualizado.getEmail()
+                );
 
-        if(existeDuplicado &&
-                (!proveedor.getEmpresa().equals(proveedorActualizado.getEmpresa()) ||
-                        !proveedor.getTelefono().equals(proveedorActualizado.getTelefono()) ||
-                        !proveedor.getEmail().equals(proveedorActualizado.getEmail()))) {
+        if (duplicado.isPresent() && !duplicado.get().getId().equals(id)) {
             throw new IllegalArgumentException("Ya existe un proveedor con la misma empresa, teléfono o email");
         }
 

@@ -24,8 +24,8 @@ export class ProductoService {
     return this.http.get<Producto[]>(this.apiUrl);
   }
 
-  getProductosConStock(): Observable<Producto[]> {
-    return this.http.get<Producto[]>(`${this.apiUrl}/con-stock`);
+  getProductosActivos(): Observable<Producto[]> {
+    return this.http.get<Producto[]>(`${this.apiUrl}/activos`);
   }
 
   getProducto(id: number): Observable<Producto> {
