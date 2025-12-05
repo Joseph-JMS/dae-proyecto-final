@@ -1,1 +1,123 @@
-<p>inventario works!</p>
+<div class="lista-container">
+  <h1>Lista de Productos</h1>
+  <button class="btn-new" (click)="abrirFormulario()">Nuevo Producto</button>
+
+  <p *ngIf="loading">Cargando productos...</p>
+  <p *ngIf="error" class="error">{{ error }}</p>
+
+  <table *ngIf="!loading && productos.length > 0">
+    <thead>
+      <tr>
+        <th>ID</th>
+        <th>Nombre</th>
+        <th>Precio</th>
+        <th>Stock</th>
+        <th>Estado</th>
+        <th>Acciones</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let e of productos">
+        <td>{{ e.id }}</td>
+        <td>{{ e.nombre }}</td>
+        <td>{{ e.precio }}</td>
+        <td>{{ e.stock }}</td>
+        <td>{{ e.estado }}</td>
+        <td>
+          <button class="btn-edit" (click)="abrirFormulario(e)">Editar</button>
+          <button class="btn-delete" (click)="eliminar(e.id)">Eliminar</button>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+
+  <p *ngIf="!loading && productos.length === 0">No hay productos registrados.</p>
+
+  <!-- FORMULARIO SIMPLE -->
+  <div class="modal" *ngIf="showForm">
+    <div class="modal-content">
+      <h2>{{ editMode ? 'Editar Producto' : 'Nuevo Producto' }}</h2>
+      <form #f="ngForm" (ngSubmit)="guardar(f)">
+        <label>Nombre</label>
+        <input 
+          [(ngModel)]="selected.nombre" 
+          name="nombre" 
+          required
+          minlength="3"
+          pattern="^[a-zA-ZÀ-ÿ\s]+$"
+          #nombre="ngModel"
+        />
+        <div class="error-msg"
+            *ngIf="nombre.invalid && (nombre.touched || nombre.dirty)">
+          
+          <span *ngIf="nombre.errors?.['required']">El nombre es obligatorio.</span>
+          <span *ngIf="nombre.errors?.['minlength']">El nombre es muy corto.</span>
+          <span *ngIf="nombre.errors?.['pattern']">Solo se permiten letras.</span>
+        </div>
+
+        <label>Precio</label>
+        <input 
+          [(ngModel)]="selected.precio" 
+          name="precio" 
+          type="number" 
+          required
+          min="0"
+          #precio="ngModel"
+        />
+        <div class="error-msg"
+            *ngIf="precio.invalid && (precio.touched || precio.dirty)">
+          Ingresa un precio valido
+        </div>
+        <div class="error-msg" *ngIf="correoDuplicado">
+          Este correo ya está registrado.
+        </div>
+
+        <label>Stock</label>
+        <input 
+          [(ngModel)]="selected.stock"
+          type="number" 
+          name="stock" 
+          required
+          minlength="3" 
+          #stock="ngModel"
+        />
+        <div class="error-msg"
+            *ngIf="stock.invalid && (stock.touched || stock.dirty)">
+          
+          <span *ngIf="stock.errors?.['required']">La carrera es obligatoria.</span>
+          <span *ngIf="stock.errors?.['minlength']">Debe tener al menos 3 caracteres.</span>
+        </div>
+
+        <label>Estado</label>
+        <input 
+          [(ngModel)]="selected.estado" 
+          name="estado" 
+          type="text" 
+          required
+          min="1" 
+          max="14"
+          #estado="ngModel"
+        />
+        <div class="error-msg"
+            *ngIf="estado.invalid && (estado.touched || estado.dirty)">
+          
+          <span *ngIf="estado.errors?.['required']">El semestre es obligatorio.</span>
+          <span *ngIf="estado.errors?.['min']">Debe ser mínimo 1.</span>
+          <span *ngIf="estado.errors?.['max']">No puede ser mayor a 12.</span>
+        </div>
+
+        <div class="modal-buttons">
+          <button 
+            type="submit" 
+            class="btn-save"
+            [disabled]="f.invalid"
+            novalidate
+          >
+            {{ editMode ? 'Actualizar' : 'Crear' }}
+          </button>
+          <button type="button" class="btn-cancel" (click)="cerrarFormulario()">Cancelar</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
